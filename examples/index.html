@@ -1,0 +1,216 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="../datawriterclient.min.css">
+	<script src="../datawriterclient.min.js" type="text/javascript"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</head>
+<body>
+	<!-- view -->
+	<div class="container">
+		<div class="row">
+			<div class="col-md-10">
+				<div class="panel panel-primary">
+					<div class="panel-heading" id="accordion">
+						<span class="glyphicon glyphicon-credit-card"></span> Card encoding 
+						<div class="pull-right">
+							<div class="btn-group">
+								<button type="button" class="btn btn-default btn-xs" id="showTasksButton" onclick="dwWebClient.TaskProtocol.getTaskList()" style="display:none">
+									<span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Tasks
+								</button>
+							</div>
+							<div class="btn-group">
+								<button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#dwSettingsModal" onclick="loadDWModalSettings()">
+									<span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Settings
+								</button>
+							</div>
+							&nbsp;&nbsp;&nbsp;
+							<div class="btn-group">
+								<a type="button" href="#collapseOne" onclick="startDWWebClient();">
+									<span class="glyphicon glyphicon-play" style="color:white"></span>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="panel-collapse collapse" id="collapseOne">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="panel-body" id="dwmessagesscroll">
+									<ul class="list-group" id="dwmessages">						  
+									</ul>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="panel-body" id="dwmessagesscroll">
+									<div id="cardPreviewId" style="display: none;">
+										<div class="row">
+											<h4>Card preview:</h4>
+										</div>
+										<img id="cardPreviewImgId" class="img-responsive img-thumbnail col-sm-6 vcenter card-img" src="" style="display: none;"/>
+										<img id="cardPreviewImgBackId" class="img-responsive img-thumbnail col-sm-6 vcenter card-img" src="" style="display: none;"/>
+									</div>
+									<div class="row">
+										<h4 class="vcenter">Record fields:</h4>
+										<button type="button" class="btn btn-primary vcenter pull-right" id="userValideButton" style="display:none; vertical-align: middle"
+										onclick="dwWebClient.TaskProtocol.UserInteractionAskedCompleted()">
+										Validate
+									</button>
+								</div>
+								<ul class="list-group" id="dwRecordFields">			  
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="dwSettingsModal" tabindex="-1" role="dialog" aria-labelledby="dwSettingsModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dwSettingsModalLabel">Settings</h4>
+			</div>
+			<div class="modal-body">
+			 <div class="form-group">
+			    <label for="uri">Uri:</label>
+			    <input type="url" class="form-control" id="dwUri">
+			  </div>
+			  <div class="form-group">
+			    <label for="login">Login:</label>
+			    <input type="text" class="form-control" id="dwLogin">
+			  </div>
+			  <div class="form-group">
+			    <label for="pwd">Password:</label>
+			    <input type="password" class="form-control" id="dwPassword">
+			  </div>
+			  <div class="form-group">
+			    <label for="taskId">Task ID:</label>
+			    <input type="number" class="form-control" id="dwTaskId">
+			  </div>
+			</div>
+			<div class="modal-footer">
+	          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="getDWModalSettings()">Save changes</button>
+	        </div>
+		</div>
+	</div>
+</div>
+
+<!-- TaskSelector Modal -->
+<div class="modal fade" id="dwTaskSelectorModal" tabindex="-1" role="dialog" aria-labelledby="dwTaskSelectorLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dwTaskSelectorLabel">Select the task to perform</h4>
+			</div>
+			<div class="modal-body" id="dwTaskSelectorList">
+				<!-- tasks info -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Camera Modal -->
+<div class="modal fade" id="dwCameraModal" tabindex="-1" role="dialog" aria-labelledby="dwCameraLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dwCameraLabel">Webcam</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row text-center">
+					<video width="250" height="250" id="dwVideo"></video>
+				</div>
+				<div class="row text-center">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" id="dwPictureCambutton">Take a picture</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- CardErrorUserInteractionAsked Modal -->
+<div class="modal fade" id="dwCardErrorUserInteractionAskedModal" tabindex="-1" role="dialog" aria-labelledby="dwCardErrorUserInteractionAskedModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dwCardErrorUserInteractionAskedModalLabel"></h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<button type="button" class="col-md-4 btn btn-primary" data-dismiss="modal" onclick="dwWebClient.TaskProtocol.CardErrorUserInteractionAskedCompleted('Retry')">Retry</button>
+					<button type="button" class="col-md-4 btn btn-danger" data-dismiss="modal" onclick="dwWebClient.TaskProtocol.CardErrorUserInteractionAskedCompleted('Cancel')">Cancel</button>
+					<button type="button" class="col-md-4 btn btn-info" data-dismiss="modal" onclick="dwWebClient.TaskProtocol.CardErrorUserInteractionAskedCompleted('Skip')">Skip</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Printing Modal -->
+<div class="modal fade" id="dwPrintingModal" tabindex="-1" role="dialog" aria-labelledby="dwPrintingModal">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="dwPrintingModalLabel">Printing step:</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<img id="cardPreviewImgModalId" class="img-responsive img-thumbnail col-sm-6 vcenter card-img" src="" style="display: none;"/>
+					<img id="cardPreviewImgBackModalId" class="img-responsive img-thumbnail col-sm-6 vcenter card-img" src="" style="display: none;"/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info" data-dismiss="modal" onclick="dwWebClient.TaskProtocol.ProcessClientCreationStepCompleted()">Print</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- download reader soft -->
+<iframe width="1" height="1" style="display:none" id="downloadReaderSoftId" src=""></iframe>
+<script>
+	var dwWebClientParam = {
+		'uri': 'ws://demo.islog.com',
+		'login': 'demo',
+		'password': 'demo',
+		'deviceTech': ['bin', 'protocol']
+	};
+
+	function loadDWModalSettings() {
+		$('#dwUri').val(dwWebClientParam['uri']);
+		$('#dwLogin').val(dwWebClientParam['login']);
+		$('#dwPassword').val(dwWebClientParam['password']);
+		$('#dwTaskId').val(dwWebClientParam['taskId']);
+	}
+
+	function getDWModalSettings() {
+		dwWebClientParam['uri'] = $('#dwUri').val();
+		dwWebClientParam['login'] = $('#dwLogin').val();
+		dwWebClientParam['password'] = $('#dwPassword').val();
+		dwWebClientParam['taskId'] = $('#dwTaskId').val();
+	}
+
+	function startDWWebClient() {
+		dwWebClient.init(dwWebClientParam);
+	}
+
+	var dwWebClient = dwjs();
+</script>
+</body>
+</html>

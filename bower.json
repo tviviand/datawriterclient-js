@@ -1,0 +1,44 @@
+{
+	"name": "datawriterclient-js",
+	"version": "0.1.0",
+	"description": "DataWriter Web Client JavaScript library",
+	"author": {
+		"name": "Adrien J.",
+		"email": "adrien@islog.com"
+	},
+	"homepage": "http://www.islog.com",
+	"moduleType": "es6",
+	"keywords": [
+		"datawriterclient.js",
+		"client",
+		"rfid",
+		"nfc",
+		"card",
+		"encode",
+		"print"
+	],
+	"license": "SEE LICENSE IN LICENSE",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/islog/datawriterclient-js.git"
+	},
+	"main": [
+		"./src/js/dw.js",
+		"./src/css/datawriterclient.css",
+		"./examples/index.html"
+	],
+	"ignore": [
+		"**/.*",
+		"**/*.md",
+		"Gruntfile.js",
+		"examples",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests",
+		"build"
+	],
+	"dependencies": {
+		"jquery": ">=2.2.0"
+	}
+}
