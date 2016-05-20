@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-## HEAD (Unreleased)
-_(none)_
+## 0.1.0 (2016-05-20)
+ * @Maxhy Initial release
 
 --------------------
 

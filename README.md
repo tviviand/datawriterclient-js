@@ -15,9 +15,9 @@ Once you've added the DataWriterClient.js script to your page, you can use it wi
  * And setup the server connection:
 ```html
 <script>
-var dwClient = new dwjs();
+var dwClient = dwjs();
 dwClient.init({
-	'uri': 'ws://127.0.0.1:8082',
+	'uri': 'ws://demo.islog.com', // or ws://127.0.0.1:8082 by default on a local server
 	'login': 'admin',
 	'password': 'admin'
 });
