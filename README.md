@@ -1,6 +1,6 @@
 # DataWriterClient.js
 
-DataWriter Client JavaScript library
+DataWriter Web Client JavaScript library
 
 A DataWriter client developed in JavaScript to encode & print RFID/NFC cards through web browsers.
 
@@ -9,8 +9,8 @@ A DataWriter client developed in JavaScript to encode & print RFID/NFC cards thr
 Once you've added the DataWriterClient.js script to your page, you can use it with:
  * Include JavaScript files
 ```html
-<link rel="stylesheet" type="text/css" href="datawriterclient.css">
-<script src="datawriterclient.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="datawriterclient.min.css">
+<script src="datawriterclient.min.js" type="text/javascript"></script>
 ```
  * And setup the server connection:
 ```html
@@ -19,7 +19,7 @@ var dwClient = new dwjs();
 dwClient.init({
 	'uri': 'ws://127.0.0.1:8082',
 	'login': 'admin',
-	'password': "admin'
+	'password': 'admin'
 });
 </script>
 ```
