@@ -188,15 +188,16 @@ class DataWriterClient {
         $('#dwmessages').empty();
 
         this.reset();
+		var wsType = '';
 		if ($.inArray('bin', this.options.deviceTech) !== -1) {
-			if (LocalReader.isSupported()) {
-				this.localReader = new LocalReader();
-			}
+			wsType = 'bin';
+		} else if ($.inArray('java', this.options.deviceTech) !== -1) {
+			wsType = 'java';
 		}
 
-		if (this.localReader !== null) {
-			this.localReader.binPath = this.options.binPath;
-			this.localReader.start(() => {
+		if (wsType !== '' && LocalReader.isSupported(wsType)) {
+			this.localReader = new LocalReader();
+			this.localReader.start(wsType, this.options.binPath, () => {
 				this.initDWSockets();
 			});
 		} else {
@@ -210,7 +211,7 @@ class DataWriterClient {
  */
 DataWriterClient.prototype.options = {
   /**
-   * Default order of rfid reader technology.
+   * Default order of rfid reader technology (java, bin, protocol).
    */
   'deviceTech': ['bin', 'protocol'],
   

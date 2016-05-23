@@ -33,26 +33,35 @@ export default class LocalReader {
 	detectReaderSoftwareRunning() {
 		if (!this.firstConnectionMade) {
 			var dlUrl = '';
-			if (navigator.appVersion.indexOf('Win') !== -1) {
-				dlUrl = 'DataWriterWebClient.exe';
+			if (this.wsType === 'java') {
+				dlUrl = this.binPath.replace('http://', 'jnlp://') + 'datawriterclient.jnlp';
+				var oHiddFrame = document.createElement('iframe');
+				oHiddFrame.style.visibility = 'hidden';
+				oHiddFrame.style.position = 'absolute';
+				oHiddFrame.src = dlUrl;
+				document.body.appendChild(oHiddFrame);
+			} else {
+				if (navigator.appVersion.indexOf('Win') !== -1) {
+					dlUrl = 'DataWriterWebClient.exe';
+				}
+				if (navigator.appVersion.indexOf('Mac') !== -1) {
+					dlUrl = '';
+				}
+				if (navigator.appVersion.indexOf('X11') !== -1) {
+					dlUrl = '';
+				}
+				if (navigator.appVersion.indexOf('Linux') !== -1) {
+					dlUrl = 'DataWriterWebClient';
+				}
+				$('#downloadReaderSoftId').attr('src', dlUrl);
 			}
-			if (navigator.appVersion.indexOf('Mac') !== -1) {
-				dlUrl = '';
-			}
-			if (navigator.appVersion.indexOf('X11') !== -1) {
-				dlUrl = '';
-			}
-			if (navigator.appVersion.indexOf('Linux') !== -1) {
-				dlUrl = 'DataWriterWebClient';
-			}
-
+			
 			if (dlUrl.length === 0) {
 				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
 			} else {
 				dlUrl = this.binPath + dlUrl;
 				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the DataWriterWebClient to enabled Web Encoding.');
 			}
-			$('#downloadReaderSoftId').attr('src', dlUrl);
 
 			this.firstConnectionMade = true;
 		}
@@ -80,7 +89,7 @@ export default class LocalReader {
 		if (!this.reconnectReader) {
 			DWUtils.addMessage(DWUtils.DWTypeMsg.INFO, 'Connecting to local reader...');
 		}
-		this.mLocalReaderWSSocket = new WebSocket('ws://127.0.0.1:8092');
+		this.mLocalReaderWSSocket = new WebSocket('ws://127.0.0.1:8092/Reader');
 
 		this.mLocalReaderWSSocket.onopen = () => {
 			this.reconnectReader = false;
@@ -106,8 +115,10 @@ export default class LocalReader {
 		this.waitForSocketConnection();
 	}
 
-	start(callback) {
+	start(wsType, binPath, callback) {
 		this.firstConnectionMade = false;
+		this.wsType = wsType;
+		this.binPath = binPath;
 		this.mCallback = callback;
 
 		setTimeout(() => {
@@ -117,8 +128,8 @@ export default class LocalReader {
 		this.initSocket();
 	}
 	
-	static isSupported() {
+	static isSupported(wsType) {
 		// DataWriterWebClient binary is currently fully tested on Windows only
-		return (navigator.appVersion.indexOf('Win') !== -1);
+		return (wsType === 'java' || navigator.appVersion.indexOf('Win') !== -1);
 	}
 }
