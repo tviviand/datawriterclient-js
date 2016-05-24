@@ -189,13 +189,13 @@ class DataWriterClient {
 
         this.reset();
 		var wsType = '';
-		if ($.inArray('bin', this.options.deviceTech) !== -1) {
+		if ($.inArray('bin', this.options.deviceTech) !== -1 && LocalReader.isSupported('bin')) {
 			wsType = 'bin';
-		} else if ($.inArray('java', this.options.deviceTech) !== -1) {
+		} else if ($.inArray('java', this.options.deviceTech) !== -1 && LocalReader.isSupported('java')) {
 			wsType = 'java';
 		}
 
-		if (wsType !== '' && LocalReader.isSupported(wsType)) {
+		if (wsType !== '') {
 			this.localReader = new LocalReader();
 			this.localReader.start(wsType, this.options.binPath, () => {
 				this.initDWSockets();

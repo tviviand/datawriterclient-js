@@ -34,11 +34,11 @@ export default class LocalReader {
 		if (!this.firstConnectionMade) {
 			var dlUrl = '';
 			if (this.wsType === 'java') {
-				dlUrl = this.binPath.replace('http://', 'jnlp://') + 'datawriterclient.jnlp';
+				dlUrl = this.binPath + 'datawriterclient.jnlp';
 				var oHiddFrame = document.createElement('iframe');
 				oHiddFrame.style.visibility = 'hidden';
 				oHiddFrame.style.position = 'absolute';
-				oHiddFrame.src = dlUrl;
+				oHiddFrame.src = dlUrl.replace('http://', 'jnlp://');
 				document.body.appendChild(oHiddFrame);
 			} else {
 				if (navigator.appVersion.indexOf('Win') !== -1) {
@@ -54,14 +54,16 @@ export default class LocalReader {
 					dlUrl = 'DataWriterWebClient';
 				}
 				
-				if (dlUrl.length === 0) {
-					DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
-				} else {
+				if (dlUrl.length !== 0) {
 					dlUrl = this.binPath + dlUrl;
-					DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the DataWriterWebClient to enabled Web Encoding.');
-					
 					$('#downloadReaderSoftId').attr('src', dlUrl);
 				}
+			}
+			
+			if (dlUrl.length === 0) {
+				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
+			} else {
+				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the <a href="' + dlUrl + '">DataWriterWebClient</a> to enabled Web Encoding.');
 			}
 
 			this.firstConnectionMade = true;
