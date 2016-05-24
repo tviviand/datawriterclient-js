@@ -1,6 +1,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>ISLOG DataWriter Web Client</title>
 	<link rel="stylesheet" type="text/css" href="../datawriterclient.min.css">
 	<script src="../datawriterclient.min.js" type="text/javascript"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
@@ -10,6 +11,7 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.1/js.cookie.min.js" integrity="sha384-rIsqnpLrwX4K3awoYuZJSLL2vJ8JyzJUspe/IC5DOhiTj/RGJPU+WcqioHmpKUOp" crossorigin="anonymous"></script>
 </head>
 <body>
 	<!-- view -->
@@ -84,19 +86,27 @@
 			<div class="modal-body">
 			 <div class="form-group">
 			    <label for="uri">Uri:</label>
-			    <input type="url" class="form-control" id="dwUri">
+			    <input type="url" class="form-control" id="dwUri" />
 			  </div>
 			  <div class="form-group">
 			    <label for="login">Login:</label>
-			    <input type="text" class="form-control" id="dwLogin">
+			    <input type="text" class="form-control" id="dwLogin" />
 			  </div>
 			  <div class="form-group">
 			    <label for="pwd">Password:</label>
-			    <input type="password" class="form-control" id="dwPassword">
+			    <input type="password" class="form-control" id="dwPassword" />
 			  </div>
 			  <div class="form-group">
 			    <label for="taskId">Task ID:</label>
-			    <input type="number" class="form-control" id="dwTaskId">
+			    <input type="number" class="form-control" id="dwTaskId" />
+			  </div>
+			  <div class="form-group">
+				<label>Device Technologies:</label>
+				<span class="form-control">
+					<input type="checkbox" id="dwTechJava" value="1" />&nbsp;<label for="dwTechJava">Java</label>&nbsp;&nbsp;
+					<input type="checkbox" id="dwTechBin" value="1" checked />&nbsp;<label for="dwTechBin">Native Binary</label>&nbsp;&nbsp;
+					<input type="checkbox" id="dwTechProtocol" value="1" checked />&nbsp;<label for="dwTechProtocol">DW Protocol</label>
+				</span>
 			  </div>
 			</div>
 			<div class="modal-footer">
@@ -191,12 +201,21 @@
 		'password': 'demo',
 		'deviceTech': ['bin', 'protocol'] // supported technologies: java, bin, protocol
 	};
+	
+	var jsparams = Cookies.get('dwsettings');
+	if (jsparams !== undefined) {
+		dwWebClientParam = JSON.parse(jsparams);
+	}
 
 	function loadDWModalSettings() {
 		$('#dwUri').val(dwWebClientParam['uri']);
 		$('#dwLogin').val(dwWebClientParam['login']);
 		$('#dwPassword').val(dwWebClientParam['password']);
 		$('#dwTaskId').val(dwWebClientParam['taskId']);
+		
+		$('#dwTechJava').prop('checked', $.inArray('java', dwWebClientParam['deviceTech']) > -1);
+		$('#dwTechBin').prop('checked', $.inArray('bin', dwWebClientParam['deviceTech']) > -1);
+		$('#dwTechProtocol').prop('checked', $.inArray('protocol', dwWebClientParam['deviceTech']) > -1);
 	}
 
 	function getDWModalSettings() {
@@ -204,6 +223,20 @@
 		dwWebClientParam['login'] = $('#dwLogin').val();
 		dwWebClientParam['password'] = $('#dwPassword').val();
 		dwWebClientParam['taskId'] = $('#dwTaskId').val();
+		
+		dwWebClientParam['deviceTech'] = new Array();
+		if ($('#dwTechJava').prop('checked')) {
+			dwWebClientParam['deviceTech'].push('java');
+		}
+		if ($('#dwTechBin').prop('checked')) {
+			dwWebClientParam['deviceTech'].push('bin');
+		}
+		if ($('#dwTechProtocol').prop('checked')) {
+			dwWebClientParam['deviceTech'].push('protocol');
+		}
+		
+		var jsparams = JSON.stringify(dwWebClientParam);
+		Cookies.set('dwsettings', jsparams);
 	}
 
 	function startDWWebClient() {

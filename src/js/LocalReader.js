@@ -53,14 +53,15 @@ export default class LocalReader {
 				if (navigator.appVersion.indexOf('Linux') !== -1) {
 					dlUrl = 'DataWriterWebClient';
 				}
-				$('#downloadReaderSoftId').attr('src', dlUrl);
-			}
-			
-			if (dlUrl.length === 0) {
-				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
-			} else {
-				dlUrl = this.binPath + dlUrl;
-				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the DataWriterWebClient to enabled Web Encoding.');
+				
+				if (dlUrl.length === 0) {
+					DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
+				} else {
+					dlUrl = this.binPath + dlUrl;
+					DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the DataWriterWebClient to enabled Web Encoding.');
+					
+					$('#downloadReaderSoftId').attr('src', dlUrl);
+				}
 			}
 
 			this.firstConnectionMade = true;
