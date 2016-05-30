@@ -4,10 +4,10 @@ export default class DWUtils {
 
 	static getParamTypeJSON(value, type = 'string') {
 
-		if (value === 'boolean') {
+		if (typeof value === 'boolean') {
 			type = 'bool';
 		}
-		else if (value === 'number') {
+		else if (typeof value === 'number') {
 			type = 'number';
 		}
 
