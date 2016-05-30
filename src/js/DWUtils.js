@@ -2,13 +2,17 @@
 
 export default class DWUtils {
 
-	static getParamTypeJSON(value, type = 'string') {
+	static getParamTypeJSON(value, type) {
 
-		if (typeof value === 'boolean') {
-			type = 'bool';
-		}
-		else if (typeof value === 'number') {
-			type = 'number';
+		if (type === undefined) {
+			type = 'string';
+
+			if (typeof value === 'boolean') {
+				type = 'bool';
+			}
+			else if (typeof value === 'number') {
+				type = 'number';
+			}
 		}
 
 		return { 'Type':  type, 'Value': value};
