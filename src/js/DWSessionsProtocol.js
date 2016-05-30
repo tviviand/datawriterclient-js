@@ -11,20 +11,30 @@ export default class DWSessionsProtocol {
 
 	CreateSessionCompleted(obj) {
 		obj.Method = 'AttachToSessionAsync';
-		DWUtils.sendJson(this.mWSSessions, obj);
-		DWUtils.sendJson(this.mWSTasks, obj);
-		DWUtils.sendJson(this.mWSReaders, obj);
+
+		var msg = {
+			Method: 'AttachToSessionAsync',
+			Parameters: [obj.Parameters[0].Value]
+		};
+
+		DWUtils.sendJson(this.mWSSessions, msg);
+		DWUtils.sendJson(this.mWSTasks, msg);
+		DWUtils.sendJson(this.mWSReaders, msg);
 	}
 
 	AttachToSessionCompleted(obj) {
-		DWUtils.sendJson(this.mWSSessions, {
-			Method: 'AuthenticateAsync',
-			Parameters: [this.options.login, this.options.password]
-		});
+		if (obj.Parameters[0].Value === true) {
+			DWUtils.sendJson(this.mWSSessions, {
+				Method: 'AuthenticateAsync',
+				Parameters: [this.options.login, this.options.password]
+			});
+		} else {
+			DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Authentication failed !');
+		}
 	}
 
 	AuthenticateCompleted(obj) {
-		if (obj.Parameters[0] === true) {
+		if (obj.Parameters[0].Value === true) {
 			if (this.options.taskId !== undefined && this.options.taskId.length !== 0) {
 				this.mDWTasksProtocol.startTask(this.options.taskId);
 			} else {
@@ -43,6 +53,20 @@ export default class DWSessionsProtocol {
 		});
 	}
 
+	GetAPIVersionCompleted(obj) {
+		//force api version 3
+		if (obj.Parameters !== undefined) {
+			obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
+		}
+		DWUtils.DWMServerVersion  = Number(obj.Parameters[0].Value.split('.', 1)[0]);
+		this.CreateSessionAsync();
+	}
+
+	GetAPIVersionAsync() {
+		DWUtils.sendJson(this.mWSSessions, {
+			Method: 'GetAPIVersionAsync'
+		});
+	}
 	
 	set TaskProtocol(eDWTasksProtocol) {
 		this.mDWTasksProtocol = eDWTasksProtocol;

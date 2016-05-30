@@ -1,6 +1,51 @@
 /*jshint esversion: 6*/
 
 export default class DWUtils {
+
+	static getParamTypeJSON(value, type = 'string') {
+
+		if (value === 'boolean') {
+			type = 'bool';
+		}
+		else if (value === 'number') {
+			type = 'number';
+		}
+
+		return { 'Type':  type, 'Value': value};
+	}
+
+	static convertProtocol(param, send = false) {
+
+    	if (param !== undefined && param.length !== 0) {
+    		var paramConverted = [];
+	    	var x = 0;
+	    	while (x < param.length) {
+
+	    		if (send === true) {
+	    			if (param[x].Type === undefined && DWUtils.DWMServerVersion !== 2) {
+	    				paramConverted.push(DWUtils.getParamTypeJSON(param[x]));
+	    			} else if (param[x].Type !== undefined && DWUtils.DWMServerVersion === 2) {
+	    				if (param[x].Type === 'byte[]') {
+	    					param[x].Value = DWUtils.convertBase64ToArray(param[x].Value);
+	    				}
+	    				paramConverted.push(param[x].Value);
+	    			} else {
+	    				paramConverted.push(param[x]);
+	    			}
+	    		} else {//reception We are protocol > 2 so convert all
+	    			if (param[x] === null || (param[x] !== null && param[x].Type === undefined)) {
+	    				paramConverted.push(DWUtils.getParamTypeJSON(param[x]));
+	    			} else {
+	    				paramConverted.push(param[x]);
+	    			}	    			
+	    		}
+
+	    		++x;
+	    	}
+	    	param = paramConverted;
+    	}
+    	return param;
+	}
     
     static addMessage(type, message) {
         var dwmessagesscroll = $('#dwmessagesscroll');
@@ -13,6 +58,7 @@ export default class DWUtils {
     }
 
     static sendJson(websocket, obj) {
+    	obj.Parameters = DWUtils.convertProtocol(obj.Parameters, true);
         var str = JSON.stringify(obj);
         DWUtils.log('Send: ' + str);
         websocket.send(str);
@@ -20,8 +66,13 @@ export default class DWUtils {
     
     static convertBase64ToArray(dataURI) {
 		var BASE64_MARKER = ';base64,';
-		var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
-		var base64 = dataURI.substring(base64Index);
+		var base64;
+		if (dataURI.indexOf(BASE64_MARKER) !== -1) {
+			var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+			base64 = dataURI.substring(base64Index);
+		} else {
+			base64 = dataURI;
+		}
 		var raw = window.atob(base64);
 		var byteNumbers = new Array(raw.length);
 		for (var i = 0; i < raw.length; i++) {
@@ -60,9 +111,39 @@ export default class DWUtils {
 			console.log(msg);
 		}
 	}
+
+
+	static Uint8ToString(u8a) {
+		var CHUNK_SZ = 0x8000;
+		var c = [];
+		for (var i = 0; i < u8a.length; i += CHUNK_SZ) {
+			c.push(String.fromCharCode.apply(null, u8a.subarray(i, i + CHUNK_SZ)));
+		}
+		return c.join('');
+	}
+
+	static getImageFromInputFile(self, imgId) {
+		if (self.files && self.files[0]) {
+			var FR = new FileReader();
+			FR.onload = function(e) {
+				var img = document.getElementById(imgId);
+				var maxLength = img.getAttribute('max');
+				img.onload = function() {
+					img.onload = null;
+					DWUtils.resizeImage(img, maxLength, function(data) {
+						img.src = data;
+					});
+				};
+				img.src = e.target.result;
+			};
+			FR.readAsDataURL(self.files[0]);
+		}
+	}
 }
 
 DWUtils.enableLog = false;
+
+DWUtils.DWMServerVersion = 2;
 
 DWUtils.DWTypeMsg = {
     NORMAL: '',

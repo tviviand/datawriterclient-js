@@ -13,13 +13,14 @@ export default class DWTasksProtocol {
 		this.DW_RECORD_FIELD_NAME = 'DwField';
 
 		this.DWTasksProtocolOperations = Object.getOwnPropertyNames(DWTasksProtocol.prototype);
+		this.DWMajorVersion = undefined;
 	}
 
 	addMessageNotified(obj) {
 		var param = obj.Parameters;
 
 		var type = DWUtils.DWTypeMsg.INFO;
-		switch (param[2]) {
+		switch (param[2].Value) {
 			case 0:
 				type = DWUtils.DWTypeMsg.ERROR;
 				break;
@@ -31,7 +32,7 @@ export default class DWTasksProtocol {
 				break;
 		}
 
-		DWUtils.addMessage(type, param[3]);
+		DWUtils.addMessage(type, param[3].Value);
 	}
 
 	AttachToSessionCompleted(obj) {}
@@ -46,14 +47,14 @@ export default class DWTasksProtocol {
 		$('#userValideButton').hide();
 
 		var param = obj.Parameters;
-		DWUtils.addMessage(DWUtils.DWTypeMsg.INFO, 'Current record changed: ' + param[1]);
+		DWUtils.addMessage(DWUtils.DWTypeMsg.INFO, 'Current record changed: ' + param[1].Value);
 	}
 
 	GetTaskListCompleted(obj) {
 		var param = obj.Parameters;
 
 		$('#dwTaskSelectorList').empty();
-		param[0].forEach(function(element) {
+		param[0].Value.forEach(function(element) {
 			var state = '';
 			if (element.State === 1) { // Running
 				state = ' list-group-item-success';
@@ -71,16 +72,20 @@ export default class DWTasksProtocol {
 
 	NotifyCardPreview(obj) {
 		var param = obj.Parameters;
-		var base64String;
-		if (param[1]) {
-			base64String = btoa(DWTasksProtocol.Uint8ToString(new Uint8Array(param[1])));
-			$('#cardPreviewImgId').attr('src', 'data:image/png;base64,' + base64String);
+
+		if (param[1].Value) {
+			if (this.mDWMajorVersion === 2) {
+				param[1].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(param[1].Value)));
+			}
+			$('#cardPreviewImgId').attr('src', 'data:image/png;base64,' + param[1].Value);
 			$('#cardPreviewImgId').show();
 			$('#cardPreviewId').show();
 		}
-		if (param[2]) {
-			base64String = btoa(DWTasksProtocol.Uint8ToString(new Uint8Array(param[2])));
-			$('#cardPreviewImgBackId').attr('src', 'data:image/png;base64,' + base64String);
+		if (param[2].Value) {
+			if (this.mDWMajorVersion === 2) {
+				param[2].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(param[2].Value)));
+			}
+			$('#cardPreviewImgBackId').attr('src', 'data:image/png;base64,' + param[2].Value);
 			$('#cardPreviewImgBackId').show();
 			$('#cardPreviewId').show();
 		}
@@ -90,11 +95,11 @@ export default class DWTasksProtocol {
 
 	SetTaskRecordConfiguration(obj) {
 		var param = obj.Parameters;
-		param[1].forEach(function(element) {
+		param[1].Value.forEach(function(element) {
 			if (element !== 2 && element !== 4) { //Encoding && Print
 				DWUtils.sendJson(this.mWSTasks, {
 					Method: 'SetCurrentRecordActionStepState',
-					Parameters: [this.currentProcess[0], element, 4] //NotAvailable
+					Parameters: [this.currentProcess[0].Value, element, 4] //NotAvailable
 				});
 			}
 		});
@@ -103,15 +108,15 @@ export default class DWTasksProtocol {
 	SetCurrentRecordField(obj) {
 		var param = obj.Parameters;
 
-		var name = param[1];
+		var name = param[1].Value;
 
-		var isReadOnly = param[4];
-		var currentValue = param[2];
-		var isNumber = Number.isInteger(param[2]);
+		var isReadOnly = param[4].Value;
+		var currentValue = param[2].Value;
+		var isNumber = Number.isInteger(param[2].Value);
 		var min = 0;
-		var max = param[3];
-		var displayName = param[6].length === 0 ? param[1] : param[6];
-		var editor = param[5];
+		var max = param[3].Value;
+		var displayName = param[6].Value.length === 0 ? param[1].Value : param[6].Value;
+		var editor = param[5].Value;
 		var src = '';
 		var base64String;
 
@@ -120,7 +125,11 @@ export default class DWTasksProtocol {
 			if (editor === undefined || editor === null) {
 				field.value = currentValue;
 			} else if (editor === 'Image') {
-				base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(currentValue)));
+				if (this.mDWMajorVersion === 2) {
+					base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(currentValue)));
+				} else {
+					base64String = currentValue;
+				}
 				if (base64String.length !== 0) {
 					src = 'data:image/png;base64,' + base64String;
 				}
@@ -144,7 +153,12 @@ export default class DWTasksProtocol {
 
 			} else if (editor === 'Image') {
 
-				base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(currentValue)));
+				if (this.mDWMajorVersion === 2) {
+					base64String = btoa(String.fromCharCode.apply(null, new Uint8Array(currentValue)));
+				} else {
+					base64String = currentValue;
+				}
+
 				if (base64String.length !== 0) {
 					src = 'data:image/png;base64,' + base64String;
 				}
@@ -152,9 +166,9 @@ export default class DWTasksProtocol {
 				input = '<div class="form-group">';
 				input += '<img class="img-responsive" id="' + name + this.DW_RECORD_FIELD_NAME + '"  max="' + max + '" src="' + src + '" />';
 				if (!isReadOnly) {
-					input += '<input type="file" accept="image/*" onchange="getImageFromInputFile(this, \'' + name + this.DW_RECORD_FIELD_NAME + '\')" />';
+					input += '<input id="' + name + this.DW_RECORD_FIELD_NAME + 'FileButton" type="file" accept="image/*"/>';
 					if (DWWebcam.hasUserMediaSupport()) {
-						input += '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#dwCameraModal" onclick="DWWebcam.initVideo(\'' + name + this.DW_RECORD_FIELD_NAME + '\')">Webcam</button>';
+						input += '<button id="' + name + this.DW_RECORD_FIELD_NAME + 'WebCamButton" type="button" class="btn btn-default" data-toggle="modal" data-target="#dwCameraModal">Webcam</button>';
 					}
 				}
 				input += '</div>';
@@ -162,6 +176,21 @@ export default class DWTasksProtocol {
 			}
 
 			$('#dwRecordFields').append('<li class="list-group-item"> <div class="row"> <div class="col-md-4"> ' + displayName + ' </div> <div class="col-md-8"> ' + input + ' </div></div> </li>');
+
+			if (editor === 'Image') {
+				if (!isReadOnly) {
+					if ($('#' + name + this.DW_RECORD_FIELD_NAME + 'WebCamButton') !== undefined) {
+						$('#' + name + this.DW_RECORD_FIELD_NAME + 'WebCamButton').click(name + this.DW_RECORD_FIELD_NAME, function(event) {
+							DWWebcam.initVideo(event.data);
+						});
+					}
+					if ($('#' + name + this.DW_RECORD_FIELD_NAME + 'FileButton') !== undefined) {
+						$('#' + name + this.DW_RECORD_FIELD_NAME + 'FileButton').change({instance: this, fieldId: name + this.DW_RECORD_FIELD_NAME}, function(event) {
+							DWUtils.getImageFromInputFile(this, event.data.fieldId);
+						});
+					}
+				}
+			}
 		}
 	}
 
@@ -170,21 +199,29 @@ export default class DWTasksProtocol {
 	}
 
 	GetCurrentRecordFieldValueAsync(obj) {
-		var name = obj.Parameters[1];
+		var name = obj.Parameters[1].Value;
 		var field = document.getElementById(name + this.DW_RECORD_FIELD_NAME);
 
 		var value;
+		var type;
 		if (field.type === 'number') {
 			value = parseInt(field.value);
+			type = 'number';
 		} else if (field.type === 'text') {
 			value = field.value;
+			type = 'string';
 		} else { //Image
-			value = DWUtils.convertBase64ToArray(field.getAttribute('src'));
+			if (this.mDWMajorVersion === 2) {
+				value = DWUtils.convertBase64ToArray(value);
+			} else {
+				value = field.getAttribute('src');
+			}
+			type = 'byte[]';
 		}
 
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'GetCurrentRecordFieldValueCompleted',
-			Parameters: [this.currentProcess[0], value]
+			Parameters: [this.currentProcess[0].Value, DWUtils.getParamTypeJSON(value, type)]
 		});
 	}
 	NotifyWaitInsertion(obj) {}
@@ -196,7 +233,7 @@ export default class DWTasksProtocol {
 	NotifyEndRecordCreationStep(obj) {}
 
 	CardErrorUserInteractionAskedAsync(obj) {
-		$('#dwCardErrorUserInteractionAskedModalLabel').html(obj.Parameters[1]);
+		$('#dwCardErrorUserInteractionAskedModalLabel').html(obj.Parameters[1].Value);
 		$('#dwCardErrorUserInteractionAskedModal').modal('show');
 	}
 
@@ -205,7 +242,7 @@ export default class DWTasksProtocol {
 	}
 
 	ProcessClientCreationStepAsync(obj) {
-		var type = obj.Parameters[1];
+		var type = obj.Parameters[1].Value;
 		if (type === 4) {
 
 			$('#cardPreviewImgModalId').hide();
@@ -234,33 +271,14 @@ export default class DWTasksProtocol {
 		return this.mWSTasks;
 	}
 
-	static Uint8ToString(u8a) {
-		var CHUNK_SZ = 0x8000;
-		var c = [];
-		for (var i = 0; i < u8a.length; i += CHUNK_SZ) {
-			c.push(String.fromCharCode.apply(null, u8a.subarray(i, i + CHUNK_SZ)));
-		}
-		return c.join('');
-	}
-    
-    getImageFromInputFile(self, imgId) {
-		if (self.files && self.files[0]) {
-			var FR = new FileReader();
-			FR.onload = function(e) {
-				var img = document.getElementById(imgId);
-				var maxLength = img.getAttribute('max');
-				img.onload = function() {
-					img.onload = null;
-					DWTasksProtocol.resizeImage(img, maxLength, function(data) {
-						img.src = data;
-					});
-				};
-				img.src = e.target.result;
-			};
-			FR.readAsDataURL(self.files[0]);
-		}
+	set DWMajorVersion(eDWMajorVersion) {
+		this.mDWMajorVersion = eDWMajorVersion;
 	}
 
+	get DWMajorVersion() {
+		return this.mDWMajorVersion;
+	}
+   
 	startTask(mTaskId) {
 		if (this.dwClient.localReader !== null) {
 			if (this.currentTaskId) {
@@ -307,7 +325,7 @@ export default class DWTasksProtocol {
 		$('#userValideButton').hide();
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'UserInteractionAskedCompleted',
-			Parameters: [this.currentProcess[0]]
+			Parameters: [this.currentProcess[0].Value]
 		});
 	}
 
@@ -326,7 +344,7 @@ export default class DWTasksProtocol {
 		}
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'CardErrorUserInteractionAskedCompleted',
-			Parameters: [this.currentProcess[0], type]
+			Parameters: [this.currentProcess[0].Value, type]
 		});
 	}
 
@@ -385,7 +403,7 @@ export default class DWTasksProtocol {
 
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'ProcessClientCreationStepCompleted',
-			Parameters: [this.currentProcess[0]]
+			Parameters: [this.currentProcess[0].Value]
 		});
 	}
 

@@ -57,7 +57,7 @@ class DataWriterClient {
         } else {
             DWUtils.addMessage(DWUtils.DWTypeMsg.SUCCESS, 'Connection to server succeeded !');
 
-            this.dwSessionsProtocol.CreateSessionAsync();
+            this.dwSessionsProtocol.GetAPIVersionAsync();
         }
     }
 
@@ -95,6 +95,8 @@ class DataWriterClient {
             var obj = JSON.parse(event.data);
             DWUtils.log('Sessions: ' + event.data);
 
+            obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
+
             this.dwSessionsProtocol.DoIt(obj);
         };
         this.wsSessions.onclose = event => {
@@ -116,6 +118,8 @@ class DataWriterClient {
         this.wsTasks.onmessage = event => {
             var obj = JSON.parse(event.data);
             DWUtils.log('Tasks: ' + event.data);
+
+            obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
 
             this.dwTaskProtocol.DoIt(obj);
         };
@@ -140,6 +144,8 @@ class DataWriterClient {
         this.wsReaders.onmessage = event => {
             var obj = JSON.parse(event.data);
             DWUtils.log('Readers: ' + event.data);
+
+            obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
 
             this.dwReadersProtocol.DoIt(obj);
         };

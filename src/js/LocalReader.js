@@ -102,6 +102,7 @@ export default class LocalReader {
 		this.mLocalReaderWSSocket.onmessage = (event) => {
 			//For now directly forward to reader server
 			var obj = JSON.parse(event.data);
+			obj.Parameters = DWUtils.convertProtocol(obj.Parameters, true);
 			DWUtils.sendJson(this.mWSReaders, obj);
 		};
 		this.mLocalReaderWSSocket.onclose = (event) => {
