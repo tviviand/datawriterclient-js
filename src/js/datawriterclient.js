@@ -170,6 +170,11 @@ class DataWriterClient {
 		}
     }
 
+    debug(enabled = true) {
+        DWUtils.enableLog = enabled;
+        console.log('Debug status: ' + DWUtils.enableLog);
+    }
+
 	/**
 	 * Initialize the DataWriter client according to provided options.
 	 * @param {string[]} options - Client options.
