@@ -14,7 +14,7 @@ export default class DWSessionsProtocol {
 
 		var msg = {
 			Method: 'AttachToSessionAsync',
-			Parameters: [obj.Parameters[0].Value]
+			Parameters: [{ 'Type': 'string', 'Value': obj.Parameters[0].Value}]
 		};
 
 		DWUtils.sendJson(this.mWSSessions, msg);
@@ -26,19 +26,20 @@ export default class DWSessionsProtocol {
 		if (obj.Parameters[0].Value === true) {
 			if (this.options.useApiKey)
 			{
-				if (!this.options.apiKey)
+				if (!this.options.apiKey) {
 					DWUtils.log('No API key available. Protocol will likely bug.');
+				}
 
 				DWUtils.sendJson(this.mWSSessions, {
 					Method: 'AuthenticateByAPIKeyAsync',
-					Parameters: [this.options.apiKey]
+					Parameters: [{ 'Type': 'string', 'Value':this.options.apiKey}]
 				});
 			}
 			else
 			{
 				DWUtils.sendJson(this.mWSSessions, {
 					Method: 'AuthenticateAsync',
-					Parameters: [this.options.login, this.options.password]
+					Parameters: [{ 'Type': 'string', 'Value':this.options.login}, { 'Type': 'string', 'Value':this.options.password}]
 				});
 			}
 		} else {

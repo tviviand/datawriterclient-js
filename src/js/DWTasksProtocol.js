@@ -99,7 +99,7 @@ export default class DWTasksProtocol {
 			if (element !== 2 && element !== 4) { //Encoding && Print
 				DWUtils.sendJson(this.mWSTasks, {
 					Method: 'SetCurrentRecordActionStepState',
-					Parameters: [this.currentProcess[0].Value, element, 4] //NotAvailable
+					Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': element}, { 'Type': 'number', 'Value': 4}] //NotAvailable
 				});
 			}
 		});
@@ -221,7 +221,7 @@ export default class DWTasksProtocol {
 
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'GetCurrentRecordFieldValueCompleted',
-			Parameters: [this.currentProcess[0].Value, DWUtils.getParamTypeJSON(value, type)]
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, DWUtils.getParamTypeJSON(value, type)]
 		});
 	}
 	NotifyWaitInsertion(obj) {}
@@ -284,7 +284,7 @@ export default class DWTasksProtocol {
 			if (this.currentTaskId) {
 				DWUtils.sendJson(this.mWSTasks, {
 					Method: 'DetachTask',
-					Parameters: [this.currentTaskId]
+					Parameters: [{ 'Type': 'number', 'Value': this.currentTaskId}]
 				});
 
 				this.currentTaskId = undefined;
@@ -296,7 +296,7 @@ export default class DWTasksProtocol {
 		if (this.dwClient.localReader !== null) {
 			DWUtils.sendJson(this.mWSTasks, {
 				Method: 'StartEncodingProcess',
-				Parameters: [mTaskId]
+				Parameters: [{ 'Type': 'number', 'Value': mTaskId}]
 			});
 		} else {
 			if ($.inArray('protocol', this.dwClient.options.deviceTech) !== -1) {
@@ -325,7 +325,7 @@ export default class DWTasksProtocol {
 		$('#userValideButton').hide();
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'UserInteractionAskedCompleted',
-			Parameters: [this.currentProcess[0].Value]
+			Parameters: [{ 'Type': 'string', 'Value':this.currentProcess[0].Value}]
 		});
 	}
 
@@ -344,7 +344,7 @@ export default class DWTasksProtocol {
 		}
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'CardErrorUserInteractionAskedCompleted',
-			Parameters: [this.currentProcess[0].Value, type]
+			Parameters: [{ 'Type': 'string', 'Value':this.currentProcess[0].Value}, { 'Type': 'number', 'Value': type}]
 		});
 	}
 
@@ -403,7 +403,7 @@ export default class DWTasksProtocol {
 
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'ProcessClientCreationStepCompleted',
-			Parameters: [this.currentProcess[0].Value]
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}]
 		});
 	}
 

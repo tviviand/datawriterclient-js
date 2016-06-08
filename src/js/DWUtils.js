@@ -26,16 +26,11 @@ export default class DWUtils {
 	    	while (x < param.length) {
 
 	    		if (send === true) {
-	    			if (param[x].Type === undefined && DWUtils.DWMServerVersion !== 2) {
-	    				paramConverted.push(DWUtils.getParamTypeJSON(param[x]));
-	    			} else if (param[x].Type !== undefined && DWUtils.DWMServerVersion === 2) {
-	    				if (param[x].Type === 'byte[]') {
-	    					param[x].Value = DWUtils.convertBase64ToArray(param[x].Value);
-	    				}
+					if (DWUtils.DWMServerVersion === 2 && param[x].Type === 'byte[]') {
+	    				param[x].Value = DWUtils.convertBase64ToArray(param[x].Value);
 	    				paramConverted.push(param[x].Value);
-	    			} else {
-	    				paramConverted.push(param[x]);
 	    			}
+	    			paramConverted.push(param[x]);
 	    		} else {//reception We are protocol > 2 so convert all
 	    			if (param[x] === null || (param[x] !== null && param[x].Type === undefined)) {
 	    				paramConverted.push(DWUtils.getParamTypeJSON(param[x]));
