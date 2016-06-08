@@ -38,10 +38,21 @@ class DataWriterClient {
         this.dwReadersProtocol = null;
 		
 		this.localReader = null;
+
+        this.checkTimeout = null;
     }
 	
     get TaskProtocol() {
         return this.dwTaskProtocol;
+    }
+
+    checkDWSockets() {
+       if (this.wsSessions.readyState === 3 || this.wsTasks.readyState === 3 || this.wsReaders.readyState === 3) {
+            DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Disconnect from DW Server.');
+            return;
+        }
+
+        this.checkTimeout = setTimeout(() => {this.checkDWSockets();}, 3000);
     }
 
     waitDWSockets() {
@@ -56,7 +67,7 @@ class DataWriterClient {
             }, 1000);
         } else {
             DWUtils.addMessage(DWUtils.DWTypeMsg.SUCCESS, 'Connection to server succeeded !');
-
+            this.checkDWSockets();
             this.dwSessionsProtocol.GetAPIVersionAsync();
         }
     }
@@ -76,6 +87,10 @@ class DataWriterClient {
         }
 
         this.wsTasks = this.wsReaders = this.wsSessions = null;
+        if (this.checkTimeout !== null) {
+            clearTimeout(this.checkTimeout);
+        }
+        this.checkTimeout = null;
     }
 
     initDWSockets() {
