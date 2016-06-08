@@ -24,10 +24,23 @@ export default class DWSessionsProtocol {
 
 	AttachToSessionCompleted(obj) {
 		if (obj.Parameters[0].Value === true) {
-			DWUtils.sendJson(this.mWSSessions, {
-				Method: 'AuthenticateAsync',
-				Parameters: [this.options.login, this.options.password]
-			});
+			if (this.options.useApiKey)
+			{
+				if (!this.options.apiKey)
+					DWUtils.log('No API key available. Protocol will likely bug.');
+
+				DWUtils.sendJson(this.mWSSessions, {
+					Method: 'AuthenticateByAPIKeyAsync',
+					Parameters: [this.options.apiKey]
+				});
+			}
+			else
+			{
+				DWUtils.sendJson(this.mWSSessions, {
+					Method: 'AuthenticateAsync',
+					Parameters: [this.options.login, this.options.password]
+				});
+			}
 		} else {
 			DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Authentication failed !');
 		}
