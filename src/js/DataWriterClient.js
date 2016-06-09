@@ -49,6 +49,7 @@ class DataWriterClient {
     checkDWSockets() {
        if (this.wsSessions.readyState === 3 || this.wsTasks.readyState === 3 || this.wsReaders.readyState === 3) {
             DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Disconnect from DW Server.');
+            this.resetUI();
             return;
         }
 
@@ -171,11 +172,18 @@ class DataWriterClient {
         this.waitDWSockets();
     }
 
-    reset() {
+    resetUI() {
         $('#cardPreviewId').hide();
         $('#showTasksButton').hide();
         $('#dwRecordFields').empty();
         $('#userValideButton').hide();
+
+        $('#dwCardErrorUserInteractionAskedModal').modal('hide');
+        $('#dwPrintingModal').modal('hide');
+        $('#dwTaskSelectorModal').modal('hide');
+    }
+
+    reset() {
 
         this.resetDWSockets();
 
@@ -224,6 +232,7 @@ class DataWriterClient {
 		if (wsType !== '') {
 			this.localReader = new LocalReader();
 			this.localReader.start(wsType, this.options.binPath, () => {
+                this.resetUI();
 				this.initDWSockets();
 			});
 		} else {
