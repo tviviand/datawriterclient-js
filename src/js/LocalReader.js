@@ -92,7 +92,7 @@ export default class LocalReader {
 		if (!this.reconnectReader) {
 			DWUtils.addMessage(DWUtils.DWTypeMsg.INFO, 'Connecting to local reader...');
 		}
-		this.mLocalReaderWSSocket = new WebSocket('ws://127.0.0.1:8092/Reader');
+		this.mLocalReaderWSSocket = new WebSocket('ws://127.0.0.1:27354/Reader');
 
 		this.mLocalReaderWSSocket.onopen = () => {
 			this.reconnectReader = false;
