@@ -73,7 +73,12 @@ export default class DWSessionsProtocol {
 			obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
 		}
 		DWUtils.DWMServerVersion  = Number(obj.Parameters[0].Value.split('.', 1)[0]);
-		this.CreateSessionAsync();
+
+		if (DWUtils.DWMServerVersion !== 2 && DWUtils.DWMServerVersion !== 3) {
+			DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'DataWriterClient does not support the server API: ' + obj.Parameters[0].Value);
+		} else {
+			this.CreateSessionAsync();
+		}
 	}
 
 	GetAPIVersionAsync() {
