@@ -14,6 +14,9 @@ export default class DWTasksProtocol {
 
 		this.DWTasksProtocolOperations = Object.getOwnPropertyNames(DWTasksProtocol.prototype);
 		this.DWMajorVersion = undefined;
+
+		this.cardFront = undefined;
+		this.cardBack = undefined;
 	}
 
 	addMessageNotified(obj) {
@@ -71,23 +74,36 @@ export default class DWTasksProtocol {
 	}
 
 	NotifyCardPreview(obj) {
+		obj.Parameters.unshift({ 'Type':  'number', 'Value': 0});
+		if (obj.Parameters[2].Value) {
+			obj.Parameters[2].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(obj.Parameters[2].Value)));
+		}
+		if (obj.Parameters[3].Value) {
+			obj.Parameters[3].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(obj.Parameters[3].Value)));
+		}
+
+		this.NotifyCardPicture(obj);
+	}
+
+	NotifyCardPicture(obj) {
 		var param = obj.Parameters;
 
-		if (param[1].Value) {
-			if (this.mDWMajorVersion === 2) {
-				param[1].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(param[1].Value)));
+		if (param[1].Value === 0) { //Preview
+			if (param[2].Value) {
+				$('#cardPreviewImgId').attr('src', 'data:image/bmp;base64,' + param[2].Value);
+				$('#cardPreviewImgId').show();
+				$('#cardPreviewId').show();
 			}
-			$('#cardPreviewImgId').attr('src', 'data:image/png;base64,' + param[1].Value);
-			$('#cardPreviewImgId').show();
-			$('#cardPreviewId').show();
-		}
-		if (param[2].Value) {
-			if (this.mDWMajorVersion === 2) {
-				param[2].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(param[2].Value)));
+			if (param[3].Value) {
+				$('#cardPreviewImgBackId').attr('src', 'data:image/bmp;base64,' + param[3].Value);
+				$('#cardPreviewImgBackId').show();
+				$('#cardPreviewId').show();
 			}
-			$('#cardPreviewImgBackId').attr('src', 'data:image/png;base64,' + param[2].Value);
-			$('#cardPreviewImgBackId').show();
-			$('#cardPreviewId').show();
+		} else if (param[1].Value === 1) {
+			this.cardFront = param[2].Value;
+			this.cardBack = param[3].Value;
+		} else {
+			DWUtils.log('NotifyCardPicture unknown type: ' + param[1].Value);
 		}
 	}
 
@@ -344,7 +360,7 @@ export default class DWTasksProtocol {
 		}
 		DWUtils.sendJson(this.mWSTasks, {
 			Method: 'CardErrorUserInteractionAskedCompleted',
-			Parameters: [{ 'Type': 'string', 'Value':this.currentProcess[0].Value}, { 'Type': 'number', 'Value': type}]
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': type}]
 		});
 	}
 
@@ -384,8 +400,8 @@ export default class DWTasksProtocol {
 			imgCSS = 'width: 100%; height: 100%;';
 		}
 
-		pages += '<img style="' + imgCSS + '" src="' + $('#cardPreviewImgId').attr('src') + '">';
-		pages += '<img style="' + imgCSS + '" src="' + $('#cardPreviewImgBackId').attr('src') + '">';
+		pages += '<img style="' + imgCSS + '" src="data:image/bmp;base64,' + this.cardFront + '">';
+		pages += '<img style="' + imgCSS + '" src="data:image/bmp;base64,' + this.cardBack + '">';
 		pages += '</div></body></html>';
 
 		var oHiddFrame = document.createElement('iframe');
