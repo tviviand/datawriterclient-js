@@ -1,4 +1,5 @@
 # DataWriterClient.js
+[![Build Status](https://travis-ci.org/islog/datawriterclient-js.svg?branch=master)](https://travis-ci.org/islog/datawriterclient-js)
 
 DataWriter Web Client JavaScript library
 
