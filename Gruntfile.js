@@ -243,5 +243,7 @@ module.exports = function(grunt){
   // Default task - build and test
   grunt.registerTask('default', ['build']);
   
+  grunt.registerTask('test', ['jshint']);
+  
   grunt.registerTask('dev', ['build', 'connect:dev', 'watch', 'browserify:watch']);
 };
