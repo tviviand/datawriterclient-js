@@ -311,7 +311,7 @@ export default class DWTasksProtocol {
 		
 		if (this.dwClient.localReader !== null) {
 			DWUtils.sendJson(this.mWSTasks, {
-				Method: 'StartEncodingProcess',
+				Method: (DWUtils.DWMServerVersion === 3 ? 'StartEncodingTask' : 'StartEncodingProcess'),
 				Parameters: [{ 'Type': 'number', 'Value': mTaskId}]
 			});
 		} else {
