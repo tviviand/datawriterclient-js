@@ -160,9 +160,6 @@ class DataWriterClient {
         this.wsReaders.onmessage = event => {
             var obj = JSON.parse(event.data);
             DWUtils.log('Readers: ' + event.data);
-
-            obj.Parameters = DWUtils.convertProtocol(obj.Parameters);
-
             this.dwReadersProtocol.DoIt(obj);
         };
         this.wsReaders.onclose = event => {
