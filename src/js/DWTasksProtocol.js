@@ -74,7 +74,7 @@ export default class DWTasksProtocol {
 	}
 
 	NotifyCardPreview(obj) {
-		obj.Parameters.unshift({ 'Type':  'number', 'Value': 0});
+		obj.Parameters.splice(1, 0, { 'Type':  'number', 'Value': 0});
 		if (obj.Parameters[2].Value) {
 			obj.Parameters[2].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(obj.Parameters[2].Value)));
 		}

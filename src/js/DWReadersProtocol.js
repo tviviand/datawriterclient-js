@@ -23,13 +23,6 @@ export default class DWReadersProtocol {
 		return this.mWSReaders;
 	}
 
-	SendRawCmdAsync(obj) {
-		if (DWUtils.DWMServerVersion === 2) {
-			obj.Parameters[1].Value = btoa(DWUtils.Uint8ToString(new Uint8Array(obj.Parameters[1].Value)));
-		}
-		this.SendToLocalReader(obj);
-	}
-
 	SendToLocalReader(obj) {
 		var str = JSON.stringify(obj);
         DWUtils.log('Send to reader: ' + str);
