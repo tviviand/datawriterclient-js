@@ -24,6 +24,14 @@ export default class DWSessionsProtocol {
 
 	AttachToSessionCompleted(obj) {
 		if (obj.Parameters[0].Value === true) {
+
+			if (DWUtils.DWMServerVersion !== 2) {
+				DWUtils.sendJson(this.mWSSessions, {
+					Method: 'SetDevicesAliases',
+					Parameters: [{ 'Type': 'string[]', 'Value':['', 'SAM']}]
+				});
+			}
+
 			if (this.options.useApiKey)
 			{
 				if (!this.options.apiKey) {
@@ -43,7 +51,7 @@ export default class DWSessionsProtocol {
 				});
 			}
 		} else {
-			DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Authentication failed !');
+			DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Attach to session failed !');
 		}
 	}
 
