@@ -266,6 +266,16 @@ DataWriterClient.prototype.options = {
    * DataWriter password.
    */
   'password': 'demo',
+
+  /**
+   * DataWriter Client Name (only used for API 3 >=).
+   */
+  'clientName': 'DataWriterClientJS' + (window.location.hostname !== '' ? ' ' + window.location.hostname : ''),
+
+  /**
+   * DataWriter Station Name (only used for API 3 >=).
+   */
+  'stationName': navigator.appName,
   
   /**
    * Default task identifier. If defined, the task will be started after successful authentication.

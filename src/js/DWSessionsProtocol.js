@@ -70,9 +70,18 @@ export default class DWSessionsProtocol {
 	}
 
 	CreateSessionAsync() {
-		DWUtils.sendJson(this.mWSSessions, {
-			Method: 'CreateSessionAsync'
-		});
+		if (DWUtils.DWMServerVersion === 2) {
+			DWUtils.sendJson(this.mWSSessions, {
+				Method: 'CreateSessionAsync'
+			});
+		} else {
+			DWUtils.sendJson(this.mWSSessions, {
+				Method: 'CreateSessionExAsync',
+				Parameters: [{ 'Type': 'string', 'Value': '3.0.0.0'},
+							{ 'Type': 'string', 'Value': this.options.clientName},
+							{'Type': 'string', 'Value': this.options.stationName}]
+			});
+		}
 	}
 
 	GetAPIVersionCompleted(obj) {
