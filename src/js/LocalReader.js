@@ -18,8 +18,9 @@ export default class LocalReader {
 
 	waitForSocketConnection() {
 		setTimeout(() => {
-                    if (!this.mLocalReaderWSSocket)
+                    if (!this.mLocalReaderWSSocket) {
                         return;
+                    }
 		    if (this.mLocalReaderWSSocket.readyState === 1) {
 				DWUtils.log('Local reader sucessfully connected');
 				this.mCallback();
