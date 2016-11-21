@@ -326,6 +326,25 @@ export default class DWTasksProtocol {
 
 		this.currentTaskId = mTaskId;
 	}
+	
+	startToken(mToken) {
+		$('#dwTaskSelectorModal').modal('hide');
+		
+		if (this.dwClient.localReader !== null) {
+			DWUtils.sendJson(this.mWSTasks, {
+				Method: 'StartEncodingProcess',
+				Parameters: [{ 'Type': 'string', 'Value': mToken}]
+			});
+		} else {
+			if ($.inArray('protocol', this.dwClient.options.deviceTech) !== -1) {
+				var oHiddFrame = document.createElement('iframe');
+				oHiddFrame.style.visibility = 'hidden';
+				oHiddFrame.style.position = 'absolute';
+				oHiddFrame.src = 'datawriter://' + btoa(this.dwClient.options.uri + '@' + this.dwClient.options.login + ':' + this.dwClient.options.password + '/' + mToken);
+				document.body.appendChild(oHiddFrame);
+			}
+		}
+	}
 
 	getTaskList() {
 		if (this.mWSTasks !== null) {
