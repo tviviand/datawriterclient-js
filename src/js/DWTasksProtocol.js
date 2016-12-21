@@ -382,8 +382,23 @@ export default class DWTasksProtocol {
 			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': type}]
 		});
 	}
-
+	
 	ProcessClientCreationStepCompleted() {
+		DWUtils.sendJson(this.mWSTasks, {
+			Method: 'ProcessClientCreationStepCompleted',
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}]
+		});
+	}
+	
+	CancelPrintClientCreationStep() {
+		DWUtils.sendJson(this.mWSTasks, {
+			Method: 'SetCurrentRecordActionStepState',
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': 4}, { 'Type': 'number', 'Value': 2}]
+		});
+		this.ProcessClientCreationStepCompleted();
+	}
+
+	ProcessPrintClientCreationStep() {
 		$('#dwPrintingModal').modal('hide');
 		$('#cardPreviewImgModalId').attr('src', '');
 		$('#cardPreviewImgBackModalId').attr('src', '');
@@ -420,7 +435,9 @@ export default class DWTasksProtocol {
 		}
 
 		pages += '<img style="' + imgCSS + '" src="data:image/bmp;base64,' + this.cardFront + '">';
-		pages += '<img style="' + imgCSS + '" src="data:image/bmp;base64,' + this.cardBack + '">';
+		if (this.cardBack !== undefined && this.cardBack !== null) {
+			pages += '<img style="' + imgCSS + '" src="data:image/bmp;base64,' + this.cardBack + '">';
+		}
 		pages += '</div></body></html>';
 
 		var oHiddFrame = document.createElement('iframe');
@@ -435,11 +452,12 @@ export default class DWTasksProtocol {
 		oHiddFrame.style.height = '100%';
 		oHiddFrame.srcdoc = pages;
 		document.body.appendChild(oHiddFrame);
-
+		
 		DWUtils.sendJson(this.mWSTasks, {
-			Method: 'ProcessClientCreationStepCompleted',
-			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}]
+			Method: 'SetCurrentRecordActionStepState',
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': 4}, { 'Type': 'number', 'Value': 1}]
 		});
+		this.ProcessClientCreationStepCompleted();
 	}
 
 	DoIt(obj) {
