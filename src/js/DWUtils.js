@@ -66,6 +66,15 @@ export default class DWUtils {
         websocket.send(str);
     }
     
+    static removeBase64Tag(dataURI) {
+		var BASE64_MARKER = ';base64,';
+		if (dataURI.indexOf(BASE64_MARKER) !== -1) {
+			var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+			return dataURI.substring(base64Index);
+		}
+		return dataURI;
+	}
+
     static convertBase64ToArray(dataURI) {
 		var BASE64_MARKER = ';base64,';
 		var base64;

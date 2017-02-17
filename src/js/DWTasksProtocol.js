@@ -228,9 +228,9 @@ export default class DWTasksProtocol {
 			type = 'string';
 		} else { //Image
 			if (this.mDWMajorVersion === 2) {
-				value = DWUtils.convertBase64ToArray(value);
+				value = DWUtils.convertBase64ToArray(field.value);
 			} else {
-				value = field.getAttribute('src');
+				value = DWUtils.removeBase64Tag(field.getAttribute('src'));
 			}
 			type = 'byte[]';
 		}
@@ -240,6 +240,7 @@ export default class DWTasksProtocol {
 			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, DWUtils.getParamTypeJSON(value, type)]
 		});
 	}
+
 	NotifyWaitInsertion(obj) {}
 
 	NotifyBeginRecordCreationStep(obj) {}
