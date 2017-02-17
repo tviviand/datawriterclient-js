@@ -18,7 +18,10 @@ export default class LocalReader {
 
 	waitForSocketConnection() {
 		setTimeout(() => {
-			if (this.mLocalReaderWSSocket.readyState === 1) {
+                    if (!this.mLocalReaderWSSocket) {
+                        return;
+                    }
+		    if (this.mLocalReaderWSSocket.readyState === 1) {
 				DWUtils.log('Local reader sucessfully connected');
 				this.mCallback();
 			} else {
@@ -63,7 +66,7 @@ export default class LocalReader {
 			if (dlUrl.length === 0) {
 				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Sorry, your OS is currently not supported.');
 			} else {
-				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Please download and run the <a href="' + dlUrl + '">DataWriterWebClient</a> to enabled Web Encoding.');
+				DWUtils.addMessage(DWUtils.DWTypeMsg.WARNING, 'Please download and run the <a href="' + dlUrl + '">DataWriterWebClient</a> to enabled Web Encoding.');
 			}
 
 			this.firstConnectionMade = true;
@@ -108,7 +111,7 @@ export default class LocalReader {
 		this.mLocalReaderWSSocket.onclose = (event) => {
 			DWUtils.log('Local reader disconnected. Reconnecting...');
 			if (!this.reconnectReader) {
-				DWUtils.addMessage(DWUtils.DWTypeMsg.ERROR, 'Local reader disconnected. Reconnecting...');
+				DWUtils.addMessage(DWUtils.DWTypeMsg.WARNING, 'Local reader disconnected. Reconnecting...');
 			}
 			this.reconnectReader = true;
 			setTimeout(() => {

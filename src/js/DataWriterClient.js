@@ -204,6 +204,7 @@ class DataWriterClient {
 	 * @param {string} options[].username - DataWriter username.
 	 * @param {string} options[].password - DataWriter password.
 	 * @param {string} options[].taskId - Default task identifier. If defined, the task will be started after successful authentication.
+	 * @param {string} options[].token - Encoding token. If defined, the process will be started after successful authentication.
 	 */
     init(options) {
         // Updated options with supplied options
@@ -281,6 +282,11 @@ DataWriterClient.prototype.options = {
    * Default task identifier. If defined, the task will be started after successful authentication.
    */
   'taskId': undefined,
+  
+  /**
+   * Encoding token. If defined, the process will be started after successful authentication.
+   */
+  'token': undefined,
 };
 
 export default DataWriterClient;

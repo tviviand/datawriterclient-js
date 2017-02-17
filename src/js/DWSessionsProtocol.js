@@ -59,6 +59,8 @@ export default class DWSessionsProtocol {
 		if (obj.Parameters[0].Value === true) {
 			if (this.options.taskId !== undefined && this.options.taskId.length !== 0) {
 				this.mDWTasksProtocol.startTask(this.options.taskId);
+			} else if (this.options.token !== undefined && this.options.token.length !== 0) {
+				this.mDWTasksProtocol.startToken(this.options.token);
 			} else {
 				this.mDWTasksProtocol.getTaskList();
 			}
