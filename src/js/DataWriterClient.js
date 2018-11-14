@@ -4,12 +4,12 @@ import DWUtils from './DWUtils';
 import DWReadersProtocol from './DWReadersProtocol';
 import DWSessionsProtocol from './DWSessionsProtocol';
 import DWTasksProtocol from './DWTasksProtocol';
-import LocalReader from './LocalReader';
+import DataWriterBridge from './DataWriterBridge';
 
 // For IE
 Number.isInteger = Number.isInteger || function(value) {
-    return typeof value === 'number' && 
-           isFinite(value) && 
+    return typeof value === 'number' &&
+           isFinite(value) &&
            Math.floor(value) === value;
 };
 
@@ -24,11 +24,11 @@ class DataWriterClient {
     constructor() {
 		// Make a copy of prototype.options to protect against overriding defaults
         this.options = $.extend({}, DataWriterClient.prototype.options);
-		
+
         if (!window.WebSocket) {
             throw new Error('WebSocket is not supported.');
         }
-		
+
         this.wsSessions = null;
         this.wsTasks = null;
         this.wsReaders = null;
@@ -36,12 +36,12 @@ class DataWriterClient {
         this.dwTaskProtocol = null;
         this.dwSessionsProtocol = null;
         this.dwReadersProtocol = null;
-		
-		this.localReader = null;
+
+		this.dataWriterBridge = null;
 
         this.checkTimeout = null;
     }
-	
+
     get TaskProtocol() {
         return this.dwTaskProtocol;
     }
@@ -151,9 +151,9 @@ class DataWriterClient {
             DWUtils.log(this.options.uri + '/Readers connected');
             this.dwReadersProtocol = new DWReadersProtocol();
             this.dwReadersProtocol.WebSocketReaders = this.wsReaders;
-			if (this.localReader !== null) {
-				this.localReader.WebSocketReaders = this.wsReaders;
-				this.dwReadersProtocol.ProxyReader = this.localReader.LocalReaderWSSocket;
+			if (this.dataWriterBridge !== null) {
+				this.dataWriterBridge.WebSocketReaders = this.wsReaders;
+				this.dwReadersProtocol.ProxyReader = this.dataWriterBridge.DataWriterBridgeWebSocket;
 			}
             this.dwSessionsProtocol.WebSocketReaders = this.wsReaders;
         };
@@ -181,12 +181,12 @@ class DataWriterClient {
     }
 
     reset() {
-
+        this.debug();
         this.resetDWSockets();
 
-		if (this.localReader !== null) {
-			this.localReader.reset();
-			this.localReader = null;
+		if (this.dataWriterBridge !== null) {
+			this.dataWriterBridge.reset();
+			this.dataWriterBridge = null;
 		}
     }
 
@@ -205,36 +205,39 @@ class DataWriterClient {
 	 * @param {string} options[].password - DataWriter password.
 	 * @param {string} options[].taskId - Default task identifier. If defined, the task will be started after successful authentication.
 	 * @param {string} options[].token - Encoding token. If defined, the process will be started after successful authentication.
+     * @param options[].bridgeOpt -- bridge config options.
 	 */
     init(options) {
         // Updated options with supplied options
         this.options = $.extend(this.options, options);
-        
+
         // if the global option object was accidentally blown away by
         // someone, bail early with an informative error
         if (!this.options || !this.options.deviceTech || !this.options.deviceTech.length) {
             throw new Error('No deviceTech specified.');
         }
-		
+
         $('#collapseOne').collapse('show');
         $('#dwmessages').empty();
 
+        console.log('Devices tech = ' + this.options.deviceTech);
         this.reset();
-		var wsType = '';
-		if ($.inArray('bin', this.options.deviceTech) !== -1 && LocalReader.isSupported('bin')) {
-			wsType = 'bin';
-		} else if ($.inArray('java', this.options.deviceTech) !== -1 && LocalReader.isSupported('java')) {
+		let wsType = '';
+        if ($.inArray('java', this.options.deviceTech) !== -1 && DataWriterBridge.isSupported('java')) {
 			wsType = 'java';
-		}
+		} else if ($.inArray('protocol', this.options.deviceTech) !== -1 && DataWriterBridge.isSupported('protocol'))
+        {
+            wsType = 'protocol';
+        }
 
 		if (wsType !== '') {
-			this.localReader = new LocalReader();
-			this.localReader.start(wsType, this.options.binPath, () => {
+			this.dataWriterBridge = new DataWriterBridge(this.options.bridgeOpt);
+			this.dataWriterBridge.start(wsType, this.options.binPath, () => {
                 this.resetUI();
 				this.initDWSockets();
 			});
 		} else {
-			this.initDWSockets();
+		    DWUtils.addMessage(DWUtils.DWTypeMsg.WARNING, 'No encoding technology enabled or available.');
 		}
     }
 }
@@ -244,25 +247,25 @@ class DataWriterClient {
  */
 DataWriterClient.prototype.options = {
   /**
-   * Default order of rfid reader technology (java, bin, protocol).
+   * Default order of rfid reader technology (java, protocol).
    */
-  'deviceTech': ['bin', 'protocol'],
-  
+  'deviceTech': ['java', 'protocol'],
+
   /**
    * Binaries (exe file, ...) root path.
    */
-  'binPath': 'http://download.islog.com/datawriter/client/web/',
-  
+  'binPath': 'http://download.islog.com/datawriter/client/web2/',
+
   /**
    * DataWriter server address.
    */
   'uri': 'ws://demo.islog.com',
-  
+
   /**
    * DataWriter username.
    */
   'username': 'demo',
-  
+
   /**
    * DataWriter password.
    */
@@ -277,16 +280,24 @@ DataWriterClient.prototype.options = {
    * DataWriter Station Name (only used for API 3 >=).
    */
   'stationName': navigator.appName,
-  
+
   /**
    * Default task identifier. If defined, the task will be started after successful authentication.
    */
   'taskId': undefined,
-  
+
   /**
    * Encoding token. If defined, the process will be started after successful authentication.
    */
   'token': undefined,
+
+    'bridgeOpt': {
+      'SSLPort' : 4040,
+        'port': 4444,
+        'SSLEnabled': false, // SSL browser to bridge
+        'EncodingClientSSL': false, // SSL, encoding client to bridge.
+        'baseURL': 'rfid.onl'
+    }
 };
 
 export default DataWriterClient;

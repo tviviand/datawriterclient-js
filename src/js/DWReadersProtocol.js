@@ -23,17 +23,17 @@ export default class DWReadersProtocol {
 		return this.mWSReaders;
 	}
 
-	SendToLocalReader(obj) {
+	SendToBridge(obj) {
 		var str = JSON.stringify(obj);
         DWUtils.log('Send to reader: ' + str);
-        this.mProxyReader.send(str); //foward to reader directly
+        this.mProxyReader.send(str); //forward to bridge
 	}
 
 	DoIt(obj) {
 		if ($.inArray(obj.Method, this.DWReadersProtocolOperations) !== -1) {
 			this[obj.Method](obj);
 		} else {
-			this.SendToLocalReader(obj); //foward to reader directly
+			this.SendToBridge(obj); //forward to bridge
 		}
 	}
 }

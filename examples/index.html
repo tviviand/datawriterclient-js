@@ -104,7 +104,6 @@
 				<label>Device Technologies:</label>
 				<span class="form-control">
 					<input type="checkbox" id="dwTechJava" value="1" />&nbsp;<label for="dwTechJava">Java</label>&nbsp;&nbsp;
-					<input type="checkbox" id="dwTechBin" value="1" checked />&nbsp;<label for="dwTechBin">Native Binary</label>&nbsp;&nbsp;
 					<input type="checkbox" id="dwTechProtocol" value="1" checked />&nbsp;<label for="dwTechProtocol">DW Protocol</label>
 				</span>
 			  </div>
@@ -199,7 +198,7 @@
 		'uri': 'ws://demo.islog.com',
 		'login': 'demo',
 		'password': 'demo',
-		'deviceTech': ['java', 'bin', 'protocol'] // supported technologies: java, bin, protocol
+		'deviceTech': ['java', 'protocol'] // supported technologies: java, protocol
 	};
 	
 	var jsparams = Cookies.get('dwsettings');
@@ -214,7 +213,6 @@
 		$('#dwTaskId').val(dwWebClientParam['taskId']);
 		
 		$('#dwTechJava').prop('checked', $.inArray('java', dwWebClientParam['deviceTech']) > -1);
-		$('#dwTechBin').prop('checked', $.inArray('bin', dwWebClientParam['deviceTech']) > -1);
 		$('#dwTechProtocol').prop('checked', $.inArray('protocol', dwWebClientParam['deviceTech']) > -1);
 	}
 
@@ -227,9 +225,6 @@
 		dwWebClientParam['deviceTech'] = new Array();
 		if ($('#dwTechJava').prop('checked')) {
 			dwWebClientParam['deviceTech'].push('java');
-		}
-		if ($('#dwTechBin').prop('checked')) {
-			dwWebClientParam['deviceTech'].push('bin');
 		}
 		if ($('#dwTechProtocol').prop('checked')) {
 			dwWebClientParam['deviceTech'].push('protocol');

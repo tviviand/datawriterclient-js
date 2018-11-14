@@ -33,4 +33,5 @@ For details, see [LICENSE](https://github.com/islog/datawriterclient-js/blob/mas
 
 ## Release History
 
+ - 0.2.0: SSL support
  - 0.1.0: Initial release

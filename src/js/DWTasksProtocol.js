@@ -297,7 +297,7 @@ export default class DWTasksProtocol {
 	}
    
 	startTask(mTaskId) {
-		if (this.dwClient.localReader !== null) {
+		if (this.dwClient.dataWriterBridge !== null) {
 			if (this.currentTaskId) {
 				DWUtils.sendJson(this.mWSTasks, {
 					Method: 'DetachTask',
@@ -310,7 +310,7 @@ export default class DWTasksProtocol {
 
 		$('#dwTaskSelectorModal').modal('hide');
 		
-		if (this.dwClient.localReader !== null) {
+		if (this.dwClient.dataWriterBridge !== null) {
 			DWUtils.sendJson(this.mWSTasks, {
 				Method: (DWUtils.DWMServerVersion === 3 ? 'StartEncodingTask' : 'StartEncodingProcess'),
 				Parameters: [{ 'Type': 'number', 'Value': mTaskId}]
@@ -331,7 +331,7 @@ export default class DWTasksProtocol {
 	startToken(mToken) {
 		$('#dwTaskSelectorModal').modal('hide');
 		
-		if (this.dwClient.localReader !== null) {
+		if (this.dwClient.dataWriterBridge !== null) {
 			DWUtils.sendJson(this.mWSTasks, {
 				Method: 'StartEncodingProcess',
 				Parameters: [{ 'Type': 'string', 'Value': mToken}]

@@ -152,7 +152,7 @@ export default class DWUtils {
 	}
 }
 
-DWUtils.enableLog = false;
+DWUtils.enableLog = true;
 
 DWUtils.DWMServerVersion = 2;
 
