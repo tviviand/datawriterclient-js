@@ -111,13 +111,19 @@ export default class DWTasksProtocol {
 
 	SetTaskRecordConfiguration(obj) {
 		var param = obj.Parameters;
+		var instance = this;
 		param[1].Value.forEach(function(element) {
 			if (element !== 2 && element !== 4) { //Encoding && Print
-				DWUtils.sendJson(this.mWSTasks, {
+				DWUtils.sendJson(instance.mWSTasks, {
 					Method: 'SetCurrentRecordActionStepState',
-					Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}, { 'Type': 'number', 'Value': element}, { 'Type': 'number', 'Value': 4}] //NotAvailable
+					Parameters: [{ 'Type': 'string', 'Value': instance.currentProcess[0].Value}, { 'Type': 'number', 'Value': element}, { 'Type': 'number', 'Value': 4}] //NotAvailable
 				});
 			}
+		});
+		
+		DWUtils.sendJson(this.mWSTasks, {
+			Method: 'NotifyCurrentRecordClientIsReady',
+			Parameters: [{ 'Type': 'string', 'Value': this.currentProcess[0].Value}]
 		});
 	}
 
