@@ -19,8 +19,7 @@
     "print"
   ],
   "scripts": {
-    "prepare":"npm install -dev",
-    "install": "grunt",
+    "postinstall": "grunt",
     "test": "grunt test"
   },
   "repository": {
