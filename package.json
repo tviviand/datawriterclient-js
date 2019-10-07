@@ -19,7 +19,7 @@
     "print"
   ],
   "scripts": {
-    "prepare":"echo",
+    "prepare":"dir",
     "postinstall": "grunt",
     "test": "grunt test"
   },
