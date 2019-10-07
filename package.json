@@ -19,7 +19,7 @@
     "print"
   ],
   "scripts": {
-    "start":"npm install",
+    "prepare":"npm install",
     "postinstall": "grunt",
     "test": "grunt test"
   },
