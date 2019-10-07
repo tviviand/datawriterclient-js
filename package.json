@@ -19,7 +19,7 @@
     "print"
   ],
   "scripts": {
-    "prepare":"npm install",
+    "prepare":"npm install -dev",
     "install": "grunt",
     "test": "grunt test"
   },
